@@ -35,6 +35,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   int line_position = linesensors.readLine(sensor_vals, true);
   //calculate error from deisred target
+  void follow_line(){
   int error = line_position - 2500;
   int error_change = error - lastError;
     //calculate motor differential
