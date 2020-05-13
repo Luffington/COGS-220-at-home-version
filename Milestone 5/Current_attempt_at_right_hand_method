@@ -109,6 +109,28 @@ void loop() {
   bool line_on_right_ever = line_on_right;
 
   
+
+
+  while(line_on_left || line_on_right){
+    linesensors.read(sensor_vals);
+    line_on_left = sensor_vals[0] > THRESHOLD && sensor_vals[1] > THRESHOLD;
+    line_on_right = sensor_vals[5] > THRESHOLD && sensor_vals[4] > THRESHOLD;
+    
+    
+
+    line_on_left_ever = line_on_left || line_on_left_ever;
+    line_on_right_ever = line_on_right || line_on_right_ever;
+
+    finish_counter++;
+    if(finish_counter > 85){
+      //buzzer.play("O6c32d32e32f32g32"); 
+      //buzzer.playNote(NOTE_C(3), 5000, 15); 
+      //while(1) { }
+      motors.setSpeeds(0,0);
+      ;return FINISH;
+     
+    }
+  }
   
   bool line_straight = sensor_vals[2] > THRESHOLD || sensor_vals[3] > THRESHOLD;
 
@@ -143,26 +165,7 @@ void loop() {
   
   int finish_counter = 0;
   
-  while(line_on_left || line_on_right){
-    linesensors.read(sensor_vals);
-    line_on_left = sensor_vals[0] > THRESHOLD && sensor_vals[1] > THRESHOLD;
-    line_on_right = sensor_vals[5] > THRESHOLD && sensor_vals[4] > THRESHOLD;
-    
-    
-
-    line_on_left_ever = line_on_left || line_on_left_ever;
-    line_on_right_ever = line_on_right || line_on_right_ever;
-
-    finish_counter++;
-    if(finish_counter > 85){
-      //buzzer.play("O6c32d32e32f32g32"); 
-      //buzzer.playNote(NOTE_C(3), 5000, 15); 
-      //while(1) { }
-      motors.setSpeeds(0,0);
-      ;return FINISH;
-     
-    }
-  }
+  
 }
 
 
