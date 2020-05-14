@@ -1,0 +1,99 @@
+#include <Wire.h>
+#include <ZumoShield.h>
+ZumoMotors motors;
+ZumoReflectanceSensorArray linesensors(QTR_NO_EMITTER_PIN);
+ZumoBuzzer buzzer;
+
+void setup() {
+  // put your setup code here, to run once:
+
+Serial.begin(9600);
+Serial.println ("Calibration begin.");
+int i;
+int spin_direction = 1;
+motors.setSpeeds(150*spin_direction, -150*spin_direction);
+for(i = 0; i<80; i++){
+  linesensors.calibrate();
+  if(i%40 == 20){
+    spin_direction = -spin_direction;
+    motors.setSpeeds(150*spin_direction, -150*spin_direction);
+  }
+  delay(8);
+}
+Serial.println("Calibration complete!");
+motors.setSpeeds(0,0);
+delay(500);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+unsigned int sensor_vals[6]; 
+int THRESHOLD = 600;
+int line_position;
+char path[50];
+int turn_counter = 0;
+
+void loop() {
+  line_position = linesensors.readLine(sensor_vals);
+  if(sensor_vals[0] > THRESHOLD && sensor_vals[5] > THRESHOLD){
+    solved(); 
+  }else if(sensor_vals[0] > THRESHOLD && sensor_vals[1] > THRESHOLD){
+    path[turn_counter] = 'L';
+    turn_counter++;
+    turn_left();
+  } else if(sensor_vals[4] > THRESHOLD && sensor_vals[5] > THRESHOLD){
+    path[turn_counter] = 'R';
+    turn_counter++;
+    turn_right();
+  } else {
+    follow_line();
+  }
+}
+
+  
+
+void turn_left() {
+  motors.setSpeeds(-400, 400);
+  delay(100);
+}
+
+void turn_right() {
+  motors.setSpeeds(400, -400);
+  delay(100);
+}
+
+void solved(){
+  motors.setSpeeds(0,0);
+  for(int i=0; i<turn_counter+1; i++){
+    if(path[i] == 'L'){
+      buzzer.playNote(NOTE_G(5), 200, 15);
+      delay(400);
+    }
+    if(path[i] == 'R'){
+      buzzer.playNote(NOTE_G(6), 200, 15);
+      delay(400);
+    }
+  }
+  while(true){
+    
+  }
+}
+
+
+int BASE_SPEED = 250;
+double PROPORTION_GAIN = 0.2;
+double DERIVATIVE_GAIN = 3;
+int lastError = 0;
+
+void follow_line(){
+  int error = line_position - 2500;
+  int error_change = error - lastError;
+    //calculate motor differential
+ //old code: int speedDifference = (error / 4) + (error-lastError)*6; 
+  int leftSpeed = BASE_SPEED + PROPORTION_GAIN * error + DERIVATIVE_GAIN * error_change; 
+  int rightSpeed = BASE_SPEED + -PROPORTION_GAIN * error + -DERIVATIVE_GAIN * error_change;
+   lastError = error;
+
+  motors.setSpeeds(leftSpeed, rightSpeed);
+  }
+  
+//}

@@ -29,6 +29,7 @@ void setup() {
 unsigned int sensor_vals[6];
 int THRESHOLD = 400;
 int BASE_SPEED = 250;
+//int BASE_TURN_SPEED = 150;
 int line_position;
 char path[50];
 int turn_counter = 0;
@@ -70,7 +71,8 @@ void loop() {
   if (intersection_type == INTERSECTION_LEFT_T) {
     path[turn_counter] = 'S';
     turn_counter++;
-    follow_line();
+    delay(300); ///DELAY TO STOP THE DOUBLE S RECORDING PROBLEM
+    follow_line(); 
   }
   if (intersection_type == INTERSECTION_RIGHT_TURN ||
       intersection_type == INTERSECTION_RIGHT_T ||
@@ -163,8 +165,21 @@ int get_intersection_type() {
 /////////////////////////////////////////////////
 // LEFT AND RIGHT TURN FUNCTIONS
 /////////////////////////////////////////////////
+
+  double TURN_LEFT_PROPORTION_GAIN = 0.00001; // 0.3
+  double TURN_LEFT_DERIVATIVE_GAIN = 0.03; //
+  int lastLeftTurnError = 0;
+
+
 void turn_left() {
-  motors.setSpeeds(-BASE_SPEED, BASE_SPEED);
+   int left_turn_error = line_position - 2500;
+    int left_turn_error_change = left_turn_error - lastLeftTurnError;
+    //calculate motor differential
+    //old code: int speedDifference = (error / 4) + (error-lastError)*6;
+    int leftWheelTurnSpeed1 = BASE_SPEED + TURN_LEFT_PROPORTION_GAIN * left_turn_error + TURN_LEFT_DERIVATIVE_GAIN * left_turn_error_change;
+    int rightWheelTurnSpeed1 = BASE_SPEED + -TURN_LEFT_PROPORTION_GAIN * left_turn_error + -TURN_LEFT_DERIVATIVE_GAIN * left_turn_error_change;
+    lastLeftTurnError = left_turn_error;
+  motors.setSpeeds(-leftWheelTurnSpeed1, rightWheelTurnSpeed1);
   while (sensor_vals[3] > THRESHOLD) {
     linesensors.readCalibrated(sensor_vals);
   }
@@ -173,11 +188,20 @@ void turn_left() {
   }
 
 }
-
+ double TURN_RIGHT_PROPORTION_GAIN = 0.00001; // 0.3
+  double TURN_RIGHT_DERIVATIVE_GAIN = 0.03; //
+  int lastRightTurnError = 0;
 
 
 void turn_right() {
-  motors.setSpeeds(BASE_SPEED, -BASE_SPEED);
+  int right_turn_error = line_position - 2500;
+    int right_turn_error_change = right_turn_error - lastRightTurnError;
+    //calculate motor differential
+    //old code: int speedDifference = (error / 4) + (error-lastError)*6;
+    int leftWheelTurnSpeed2 = BASE_SPEED + TURN_RIGHT_PROPORTION_GAIN * right_turn_error + TURN_RIGHT_DERIVATIVE_GAIN * right_turn_error_change;
+    int rightWheelTurnSpeed2 = BASE_SPEED + -TURN_RIGHT_PROPORTION_GAIN * right_turn_error + -TURN_RIGHT_DERIVATIVE_GAIN * right_turn_error_change;
+    lastRightTurnError = right_turn_error;    
+  motors.setSpeeds(leftWheelTurnSpeed2, -rightWheelTurnSpeed2);
   while (sensor_vals[2] > THRESHOLD) {
     linesensors.readCalibrated(sensor_vals);
   }
@@ -206,26 +230,26 @@ void solved() {
   
   for (int i = 0; i < turn_counter + 1; i++) {
     if (path[i] == 'L') {
-      buzzer.playNote(NOTE_G(6), 100, 15);
-      delay(200);
-      buzzer.playNote(NOTE_G(6), 100, 15);
-      delay(800);
+      //buzzer.playNote(NOTE_G(6), 100, 15);
+      //delay(200);
+     // buzzer.playNote(NOTE_G(6), 100, 15);
+      //delay(800);
     }
     if (path[i] == 'R') {
-      buzzer.playNote(NOTE_G(6), 100, 15);
-      delay(200);
-      buzzer.playNote(NOTE_G(6), 100, 15);
-      delay(200);
-      buzzer.playNote(NOTE_G(6), 100, 15);
-      delay(800);
+     // buzzer.playNote(NOTE_G(6), 100, 15);
+     // delay(200);
+      //buzzer.playNote(NOTE_G(6), 100, 15);
+      //delay(200);
+      //buzzer.playNote(NOTE_G(6), 100, 15);
+      //delay(800);
     }
       if (path[i] == 'S') {
-        buzzer.playNote(NOTE_G(6), 100, 15);
-        delay(800);
+       // buzzer.playNote(NOTE_G(6), 100, 15);
+        //delay(200);
       }
       if (path[i] == 'U') {
-        buzzer.playNote(NOTE_C(8), 100, 15);
-        delay(400);
+       // buzzer.playNote(NOTE_C(6), 100, 15);
+       // delay(200);
       }
       
     }
@@ -390,15 +414,15 @@ void solved() {
   //PID CONTROLLER FUNCTION
   //////////////////////////////////////////
 
-  double PROPORTION_GAIN = 0.2;
-  double DERIVATIVE_GAIN = 3;
+  double PROPORTION_GAIN = 0.3;
+  double DERIVATIVE_GAIN = 1;
   int lastError = 0;
 
   void follow_line() {
     int error = line_position - 2500;
     int error_change = error - lastError;
     //calculate motor differential
-    //old code: int speedDifference = (error / 4) + (error-lastError)*6;
+   
     int leftSpeed = BASE_SPEED + PROPORTION_GAIN * error + DERIVATIVE_GAIN * error_change;
     int rightSpeed = BASE_SPEED + -PROPORTION_GAIN * error + -DERIVATIVE_GAIN * error_change;
     lastError = error;
@@ -420,7 +444,7 @@ void solved() {
           buzzer.play("!T250 O4 L8 g O5 ceg O6 ceg4.e4. O4 a- O5 ce-a- O6 ce-a-4.e-4. O4 b- O5 dfb- O6 df b-4r MS b-b-b- ML O7 c2.");
           break;
         }
-        motors.setSpeeds(BASE_SPEED, BASE_SPEED);
+        motors.setSpeeds(BASE_SPEED*2, BASE_SPEED*2);
         get_intersection_type();// just to get through the intersection
 
         if (path[solved_path_location] == 'S') {
