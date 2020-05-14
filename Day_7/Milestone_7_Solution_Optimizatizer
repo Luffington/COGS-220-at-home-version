@@ -166,8 +166,8 @@ int get_intersection_type() {
 // LEFT AND RIGHT TURN FUNCTIONS
 /////////////////////////////////////////////////
 
-  double TURN_LEFT_PROPORTION_GAIN = 0.00001; // 0.3
-  double TURN_LEFT_DERIVATIVE_GAIN = 0.03; //
+  double TURN_LEFT_PROPORTION_GAIN = 14; // 0.3
+  double TURN_LEFT_DERIVATIVE_GAIN = 3; //
   int lastLeftTurnError = 0;
 
 
@@ -179,17 +179,19 @@ void turn_left() {
     int leftWheelTurnSpeed1 = BASE_SPEED + TURN_LEFT_PROPORTION_GAIN * left_turn_error + TURN_LEFT_DERIVATIVE_GAIN * left_turn_error_change;
     int rightWheelTurnSpeed1 = BASE_SPEED + -TURN_LEFT_PROPORTION_GAIN * left_turn_error + -TURN_LEFT_DERIVATIVE_GAIN * left_turn_error_change;
     lastLeftTurnError = left_turn_error;
-  motors.setSpeeds(-leftWheelTurnSpeed1, rightWheelTurnSpeed1);
+  motors.setSpeeds(leftWheelTurnSpeed1, rightWheelTurnSpeed1);
+ delay(300);
   while (sensor_vals[3] > THRESHOLD) {
     linesensors.readCalibrated(sensor_vals);
+     
   }
   while (sensor_vals[3] < THRESHOLD) {
     linesensors.readCalibrated(sensor_vals);
   }
 
 }
- double TURN_RIGHT_PROPORTION_GAIN = 0.00001; // 0.3
-  double TURN_RIGHT_DERIVATIVE_GAIN = 0.03; //
+ double TURN_RIGHT_PROPORTION_GAIN = 14; // 0.3
+  double TURN_RIGHT_DERIVATIVE_GAIN = 3; //
   int lastRightTurnError = 0;
 
 
@@ -201,9 +203,11 @@ void turn_right() {
     int leftWheelTurnSpeed2 = BASE_SPEED + TURN_RIGHT_PROPORTION_GAIN * right_turn_error + TURN_RIGHT_DERIVATIVE_GAIN * right_turn_error_change;
     int rightWheelTurnSpeed2 = BASE_SPEED + -TURN_RIGHT_PROPORTION_GAIN * right_turn_error + -TURN_RIGHT_DERIVATIVE_GAIN * right_turn_error_change;
     lastRightTurnError = right_turn_error;    
-  motors.setSpeeds(leftWheelTurnSpeed2, -rightWheelTurnSpeed2);
+  motors.setSpeeds(leftWheelTurnSpeed2, rightWheelTurnSpeed2);
+   delay(300);
   while (sensor_vals[2] > THRESHOLD) {
     linesensors.readCalibrated(sensor_vals);
+   
   }
   while (sensor_vals[2] < THRESHOLD) {
     linesensors.readCalibrated(sensor_vals);
