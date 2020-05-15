@@ -1,0 +1,6 @@
+# Day 5 
+## Milestone 5 Revised
+### The beginning of my fifth day working on programming Cloud involved me trying to experiment with another way of solving the maze. Having calculated the length of each segment, I realised that following a right hand on the wall strategy would save several steps in reaching the finish line. To design this change, I simply switched the condition prompting Cloud to treat right hand turns as 'go straight' commands to left hand turns, and then changed all corresponding functions that prompted left turns at every intersection to right turns. This worked exactly as expected and I was pleased with the improvement so decided to keep this strategy for the remainer of the coding. 
+
+## Milestone 6
+### This milestone tested my patience as a programmer. Having tried to implement a means for reducing the path of the maze to its simplest form, I inadvertently changed some of the logic in the turning functions (which had been changed to reactive rather than ballistic). The ramifications of this mistake included spending my entire day utterly ughast as to why the robot was no longer cooperating. I did not succeed in correcting the problem and went to sleep that night disgusted and discouraged. 

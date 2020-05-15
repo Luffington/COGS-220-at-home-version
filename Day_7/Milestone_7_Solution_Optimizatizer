@@ -518,7 +518,7 @@ void solved() {
       path[path_location - 2] = c;
       flag = true;
     }
-  }
+  } 
   if(flag){
     turn_counter = turn_counter - 2;
     path[turn_counter] = ' ';
